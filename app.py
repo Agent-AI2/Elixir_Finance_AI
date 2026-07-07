@@ -1,7 +1,6 @@
-from pathlib import Path
-
 from exporters.excel_exporter import ExcelExporter
-from ingestion.document_detector import DocumentDetector
+from ingestion.import_manager import ImportManager
+
 from processors.analysis import (
     create_expense_analysis,
     create_income_analysis,
@@ -12,9 +11,9 @@ class ElixirFinanceAI:
 
     def process(self, input_file):
 
-        detector = DocumentDetector()
+        import_manager = ImportManager()
 
-        df = detector.process(Path(input_file))
+        df = import_manager.import_file(input_file)
 
         expense = create_expense_analysis(df)
 
