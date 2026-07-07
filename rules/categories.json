@@ -1,0 +1,34 @@
+{
+    "rules": [
+        {
+            "keywords": ["SMS ALERT", "COMMISSION", "CHARGE", "CHARGES", "VAT"],
+            "transaction_type": "Bank Charge",
+            "subcategory": "Bank Charges"
+        },
+        {
+            "keywords": ["POS PYMT", "POS PURCHASE"],
+            "transaction_type": "POS",
+            "subcategory": "POS Purchases"
+        },
+        {
+            "keywords": ["ATM"],
+            "transaction_type": "ATM Withdrawal",
+            "subcategory": "Cash Withdrawal"
+        },
+        {
+            "keywords": ["CASH DEPOSIT"],
+            "transaction_type": "Cash Deposit",
+            "subcategory": "Cash Deposit"
+        },
+        {
+            "keywords": ["SALARY", "PAYROLL"],
+            "transaction_type": "Salary",
+            "subcategory": "Salary Income"
+        },
+        {
+            "keywords": ["INTEREST"],
+            "transaction_type": "Interest",
+            "subcategory": "Interest Income"
+        }
+    ]
+}

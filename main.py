@@ -1,24 +1,13 @@
-from parsers.access_parser import AccessBankParser
+from app import ElixirFinanceAI
 
 
 def main():
 
-    parser = AccessBankParser()
+    app = ElixirFinanceAI()
 
-    df = parser.extract_transactions(
+    app.process(
         "samples/access_statement.pdf"
     )
-
-    print(df.info())
-
-    print(df.head(10))
-
-    df.to_excel(
-        "outputs/access_transactions.xlsx",
-        index=False
-    )
-
-    print("\n✅ Excel exported successfully!")
 
 
 if __name__ == "__main__":

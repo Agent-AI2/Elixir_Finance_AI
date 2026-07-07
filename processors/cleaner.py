@@ -8,7 +8,7 @@ bank statement data.
 import re
 from datetime import datetime
 import pandas as pd
-
+from processors.categorizer import categorize
 
 def clean_amount(value):
     """
@@ -76,18 +76,35 @@ def clean_description(value):
     return description.strip()
 
 
-def clean_dataframe(df: pd.DataFrame):
-    """
-    Cleans an extracted transaction dataframe.
-    """
+from processors.categorizer import categorize
 
+
+from processors.categorizer import categorize
+
+
+def clean_dataframe(df):
+
+    # Clean dates
     df["Posted Date"] = df["Posted Date"].apply(clean_date)
     df["Value Date"] = df["Value Date"].apply(clean_date)
 
+    # Clean amounts
     df["Debit"] = df["Debit"].apply(clean_amount)
     df["Credit"] = df["Credit"].apply(clean_amount)
     df["Balance"] = df["Balance"].apply(clean_amount)
 
+    # Clean descriptions
     df["Description"] = df["Description"].apply(clean_description)
+
+    # Categorize
+    results = df["Description"].apply(categorize)
+
+    df["Transaction Type"] = results.apply(
+        lambda x: x["Transaction Type"]
+    )
+
+    df["Subcategory"] = results.apply(
+        lambda x: x["Subcategory"]
+    )
 
     return df
