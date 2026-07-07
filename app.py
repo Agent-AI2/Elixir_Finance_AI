@@ -1,6 +1,8 @@
-from exporters.excel_exporter import ExcelExporter
-from ingestion.import_manager import ImportManager
+from pathlib import Path
+import pandas as pd
 
+from ingestion.document_detector import DocumentDetector
+from exporters.excel_exporter import ExcelExporter
 from processors.analysis import (
     create_expense_analysis,
     create_income_analysis,
@@ -11,23 +13,61 @@ class ElixirFinanceAI:
 
     def process(self, input_file):
 
-        import_manager = ImportManager()
+        detector = DocumentDetector()
 
-        df = import_manager.import_file(input_file)
+        result = detector.process(Path(input_file))
 
-        expense = create_expense_analysis(df)
+        # ==========================================
+        # ACCOUNT BOOK WORKFLOW
+        # ==========================================
+        if isinstance(result, list):
 
-        income = create_income_analysis(df)
+            print("\nDraft Digital Account Book Created\n")
 
-        unclassified = df[
-            df["Subcategory"] == "Unclassified"
-        ]
+            for page in result:
 
-        exporter = ExcelExporter()
+                print(f"Page Number : {page['page_number']}")
+                print(f"Source Files: {page['source_files']}")
+                print(
+                    f"Image Size  : "
+                    f"{page['image_width']} x {page['image_height']}"
+                )
+                print(f"Status      : {page['status']}")
+                print("-" * 50)
 
-        exporter.export(
-            transactions=df,
-            expense=expense,
-            income=income,
-            unclassified=unclassified
-        )
+            return result
+
+        # ==========================================
+        # BANK STATEMENT WORKFLOW
+        # ==========================================
+        elif isinstance(result, pd.DataFrame):
+
+            df = result
+
+            expense = create_expense_analysis(df)
+
+            income = create_income_analysis(df)
+
+            unclassified = df[
+                df["Subcategory"] == "Unclassified"
+            ]
+
+            exporter = ExcelExporter()
+
+            exporter.export(
+                transactions=df,
+                expense=expense,
+                income=income,
+                unclassified=unclassified
+            )
+
+            return df
+
+        # ==========================================
+        # UNKNOWN OBJECT
+        # ==========================================
+        else:
+
+            raise TypeError(
+                "Unsupported object returned by DocumentDetector."
+            )
