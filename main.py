@@ -3,35 +3,64 @@ from pathlib import Path
 from app import ElixirFinanceAI
 
 
+SUPPORTED_EXTENSIONS = {
+    ".pdf",
+    ".jpg",
+    ".jpeg",
+    ".png"
+}
+
+
 def main():
 
     app = ElixirFinanceAI()
 
-    samples = Path("samples")
-
-    supported_extensions = {
-        ".pdf",
-        ".jpg",
-        ".jpeg",
-        ".png"
-    }
+    sample_folder = Path("samples")
 
     files = sorted(
-        f for f in samples.iterdir()
-        if f.is_file() and f.suffix.lower() in supported_extensions
+        f for f in sample_folder.iterdir()
+        if f.is_file()
+        and f.suffix.lower() in SUPPORTED_EXTENSIONS
     )
 
-    if not files:
-
-        print("No supported files found in the samples folder.")
-
-        return
+    processed_image_batch = False
 
     for file in files:
 
-        print(f"\nProcessing: {file.name}")
+        suffix = file.suffix.lower()
 
-        app.process(file)
+        # ---------------------------------
+        # Process PDFs individually
+        # ---------------------------------
+
+        if suffix == ".pdf":
+
+            print(
+                f"\nProcessing: {file.name}"
+            )
+
+            app.process(file)
+
+        # ---------------------------------
+        # Process all images as one batch
+        # ---------------------------------
+
+        elif suffix in {
+            ".jpg",
+            ".jpeg",
+            ".png"
+        }:
+
+            if processed_image_batch:
+                continue
+
+            print(
+                "\nProcessing account book images..."
+            )
+
+            app.process(file)
+
+            processed_image_batch = True
 
 
 if __name__ == "__main__":

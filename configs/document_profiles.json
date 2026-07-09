@@ -1,0 +1,31 @@
+{
+    "analysis_book": {
+        "rotate_before_merge": true,
+        "rotation_angle": 90,
+        "merge_direction": "horizontal"
+    },
+
+    "journal": {
+        "rotate_before_merge": false,
+        "rotation_angle": 0,
+        "merge_direction": "vertical"
+    },
+
+    "cash_book": {
+        "rotate_before_merge": false,
+        "rotation_angle": 0,
+        "merge_direction": "vertical"
+    },
+
+    "ledger": {
+        "rotate_before_merge": false,
+        "rotation_angle": 0,
+        "merge_direction": "horizontal"
+    },
+
+    "custom": {
+        "rotate_before_merge": false,
+        "rotation_angle": 0,
+        "merge_direction": "horizontal"
+    }
+}

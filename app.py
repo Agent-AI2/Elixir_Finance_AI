@@ -1,73 +1,96 @@
 from pathlib import Path
-import pandas as pd
 
-from ingestion.document_detector import DocumentDetector
-from exporters.excel_exporter import ExcelExporter
-from processors.analysis import (
-    create_expense_analysis,
-    create_income_analysis,
+from ingestion.document_detector import (
+    DocumentDetector
 )
 
 
 class ElixirFinanceAI:
 
-    def process(self, input_file):
+    def process(
+        self,
+        input_file
+    ):
 
-        detector = DocumentDetector()
+        detector = (
+            DocumentDetector()
+        )
 
-        result = detector.process(Path(input_file))
+        result = detector.process(
+            Path(input_file)
+        )
 
-        # ==========================================
-        # ACCOUNT BOOK WORKFLOW
-        # ==========================================
+        # ----------------------------------
+        # Bank statement workflow
+        # ----------------------------------
+
         if isinstance(result, list):
 
-            print("\nDraft Digital Account Book Created\n")
+            # Digital account book pages
+            if (
+                len(result) > 0 and
+                isinstance(result[0], dict) and
+                "page_number" in result[0]
+            ):
 
-            for page in result:
+                for page in result:
 
-                print(f"Page Number : {page['page_number']}")
-                print(f"Source Files: {page['source_files']}")
+                    print(
+                        "\nDraft Digital Account Book Created\n"
+                    )
+
+                    print(
+                        f"Page Number      : "
+                        f"{page['page_number']}"
+                    )
+
+                    print(
+                        f"Source Files     : "
+                        f"{page['source_files']}"
+                    )
+
+                    print(
+                        f"Image Size       : "
+                        f"{page['image_width']} x "
+                        f"{page['image_height']}"
+                    )
+
+                    print(
+                        f"Text Blocks      : "
+                        f"{len(page.get('text_blocks', []))}"
+                    )
+
+                    print(
+                        f"Vertical Lines   : "
+                        f"{len(page.get('vertical_lines', []))}"
+                    )
+
+                    print(
+                        f"Horizontal Lines : "
+                        f"{len(page.get('horizontal_lines', []))}"
+                    )
+
+                    print(
+                        f"Cells Extracted  : "
+                        f"{len(page.get('cells', []))}"
+                    )
+
+                    print(
+                        f"Status           : "
+                        f"{page['status']}"
+                    )
+
+                    print(
+                        "-" * 50
+                    )
+
+            # Transaction extraction workflow
+            else:
+
                 print(
-                    f"Image Size  : "
-                    f"{page['image_width']} x {page['image_height']}"
+                    f"\nExtracted "
+                    f"{len(result)} "
+                    f"transactions."
                 )
-                print(f"Status      : {page['status']}")
-                print("-" * 50)
 
-            return result
-
-        # ==========================================
-        # BANK STATEMENT WORKFLOW
-        # ==========================================
-        elif isinstance(result, pd.DataFrame):
-
-            df = result
-
-            expense = create_expense_analysis(df)
-
-            income = create_income_analysis(df)
-
-            unclassified = df[
-                df["Subcategory"] == "Unclassified"
-            ]
-
-            exporter = ExcelExporter()
-
-            exporter.export(
-                transactions=df,
-                expense=expense,
-                income=income,
-                unclassified=unclassified
-            )
-
-            return df
-
-        # ==========================================
-        # UNKNOWN OBJECT
-        # ==========================================
-        else:
-
-            raise TypeError(
-                "Unsupported object returned by DocumentDetector."
-            )
+        return result
